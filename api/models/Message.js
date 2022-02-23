@@ -17,6 +17,9 @@ const MessageSchema = new mongoose.Schema(
     isRead: {
       type: String,
     },
+    isDeleted: {
+      type: Boolean,
+    },
   },
   { timestamps: true }
 );

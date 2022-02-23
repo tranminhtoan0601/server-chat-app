@@ -12,6 +12,7 @@ router.post("/", async (req, res) => {
       _id: req.body.sender,
     },
     isRead: "false",
+    isDeleted: "false",
   });
   try {
     const saveMessage = await newMessage.save();
@@ -28,7 +29,15 @@ router.get("/:converstationId", async (req, res) => {
     const message = await Message.find({
       converstationId: req.params.converstationId,
     });
-    res.status(200).json(message);
+    const updateMessage = await Message.findOneAndUpdate(
+      {
+        converstationId: req.params.converstationId,
+      },
+      {
+        isRead: "true",
+      }
+    );
+    res.status(200).json(updateMessage);
   } catch (err) {
     res.status(500).json(err);
   }
