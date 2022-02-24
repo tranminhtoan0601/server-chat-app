@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const Message = require("../models/Message");
+const Converstation = require("../models/Converstation");
 
 //add message
 
@@ -11,7 +12,7 @@ router.post("/", async (req, res) => {
     user: {
       _id: req.body.sender,
     },
-    isRead: "false",
+    isRead: false,
     isDeleted: "false",
   });
   try {
@@ -25,19 +26,25 @@ router.post("/", async (req, res) => {
 //get message
 
 router.get("/:converstationId", async (req, res) => {
+  const converstation = await Converstation.find({
+    _id: req.params.converstationId,
+  });
+  const idSender = converstation.map((item) => {
+    return item.members.find((i) => i !== req.body.idSender);
+  });
   try {
+    const updateMessage = await Message.updateMany(
+      {
+        converstationId: req.params.converstationId,
+        sender: idSender[0],
+      },
+      { $set: { isRead: true } }
+    );
     const message = await Message.find({
       converstationId: req.params.converstationId,
     });
-    const updateMessage = await Message.findOneAndUpdate(
-      {
-        converstationId: req.params.converstationId,
-      },
-      {
-        isRead: "true",
-      }
-    );
-    res.status(200).json(updateMessage);
+
+    res.status(200).json(message);
   } catch (err) {
     res.status(500).json(err);
   }

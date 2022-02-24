@@ -2,6 +2,7 @@ const router = require("express").Router();
 const Converstation = require("../models/Converstation");
 const Message = require("../models/Message");
 const User = require("../models/User");
+const addHours = require("date-fns/addHours");
 const { ObjectId } = require("mongodb");
 const cfsign = require("aws-cloudfront-sign");
 const path = require("path");
@@ -56,7 +57,7 @@ router.get("/:userId", async (req, res) => {
           converstationId: conversation._id,
         })
           .sort({ createdAt: -1 })
-          .select("text createdAt isRead");
+          .select("text createdAt isRead sender");
         const unReadCount = await Message.count({
           converstationId: conversation._id,
           isRead: false,
